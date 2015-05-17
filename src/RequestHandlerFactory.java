@@ -9,6 +9,7 @@ public class RequestHandlerFactory {
 	private String verb;
 	private String uri;
 	private String version;
+	private boolean keepAlive;
 
 	public RequestHandlerFactory(BufferedReader in, PrintStream out) {
 		this.in = in;
@@ -20,6 +21,17 @@ public class RequestHandlerFactory {
 		if (!parseRequestLine())
 			return new BadRequestHandler(out);
 
+		/* ignore all headers but Connection */
+		String line;
+		while ((line = in.readLine()) != null) {
+			System.out.println("Got header: " + line);
+			if (line.equals("Connection: keep-alive"))
+				keepAlive = true;
+			else if (line.equals(""))
+				break;
+		}
+
+		/* act upon verb and connection */
 		switch (verb) {
 			case "GET":  return new GETRequestHandler(in, out, uri);
 			case "HEAD": return new HEADRequestHandler(in, out, uri);
@@ -50,6 +62,16 @@ public class RequestHandlerFactory {
 		if (!uri.startsWith("/"))
 			return false;
 		uri = uri.substring(1, uri.length());
+
+		if (!version.startsWith("HTTP/1."))
+			return false;
+		version = version.substring(1 + version.indexOf("."));
+		if (version.equals("0"))
+			keepAlive = false;
+		else if (version.equals("1"))
+			keepAlive = true;
+		else
+			return false;
 
 		return true;
 	}
