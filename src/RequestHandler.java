@@ -34,19 +34,4 @@ public abstract class RequestHandler {
 	protected void sendBody() {}
 	protected void parseBody() throws IOException {}
 	protected void getBody() throws IOException {}
-
-	/* allow changing the output type */
-	protected void changeOutput(PrintStream ps) {
-		if (bkp == null)
-			bkp = out;
-
-		out = ps;
-	}
-
-	protected void restoreOutput() {
-		if (bkp != null) {
-			out = bkp;
-			bkp = null;
-		}
-	}
 }

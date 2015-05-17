@@ -10,7 +10,7 @@ public class RequestHandlerFactory {
 	private String uri;
 	private String version;
 	private boolean keepAlive = false;
-	private boolean compressedContent = false;
+	private String compressedContent = "";
 
 	public RequestHandlerFactory(BufferedReader in, PrintStream out) {
 		this.in = in;
@@ -20,12 +20,16 @@ public class RequestHandlerFactory {
 	public RequestHandler getHandler() throws IOException {
 		RequestHandler rh = getBaseHandler();
 
-		if (keepAlive && rh instanceof ItemRequestHandler)
-			rh = new KeepAliveRequestHandler((ItemRequestHandler)rh);
+		if (rh instanceof ItemRequestHandler) {
+			if (keepAlive)
+				rh = new KeepAliveRequestHandler((ItemRequestHandler)rh);
 
-		compressedContent = false;
-		if (compressedContent && rh instanceof ItemRequestHandler)
-			rh = new CompressedRequestHandler((ItemRequestHandler)rh);
+			switch (compressedContent) {
+			case "gzip":    rh = new CompressedRequestHandler((ItemRequestHandler)rh); break;
+			case "deflate": rh = new DeflatedRequestHandler((ItemRequestHandler)rh); break;
+			default: /* do nothing */
+			}
+		}
 
 		return rh;
 	}
@@ -113,6 +117,11 @@ public class RequestHandlerFactory {
 	 */
 	private void parseAcceptEncoding(String line) {
 		line = line.substring(1 + line.indexOf(" "));
-		compressedContent = line.contains("*") || line.contains("gzip");
+		if (line.contains("*") || line.startsWith("gzip"))
+			compressedContent = "gzip";
+		else if (line.contains("deflate"))
+			compressedContent = "deflate";
+		else
+			compressedContent = "";
 	}
 }
