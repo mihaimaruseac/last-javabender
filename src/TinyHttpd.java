@@ -46,6 +46,7 @@ public class TinyHttpd {
 	}
 
 	public static void main(String[] args) {
+		properties.list(System.out);
 		TinyHttpd server = new TinyHttpd();
 		server.init();
 	}
