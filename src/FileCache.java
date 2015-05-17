@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class FileCache {
-	private final int SIZE = 2;
+	private final int SIZE = Integer.parseInt(TinyHttpd.properties.getProperty("FileCacheSize", "10"));
+
 	protected HashMap<File, byte[]> contents = new HashMap<>();
 	private ReentrantLock lock = new ReentrantLock();
 
