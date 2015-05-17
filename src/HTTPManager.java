@@ -21,10 +21,13 @@ public class HTTPManager implements Runnable {
 			PrintStream out = new PrintStream(client.getOutputStream());
 
 			try {
-				RequestHandler rh = new RequestHandlerFactory(in, out).getHandler();
-				if (rh == null)
-					return;
-				rh.handle();
+				RequestHandlerFactory rhf = new RequestHandlerFactory(in, out);
+				while (true) {
+					RequestHandler rh = rhf.getHandler();
+					rh.handle();
+					if (rhf.closeConnection())
+						return;
+				}
 			} finally {
 				in.close();
 				out.close();

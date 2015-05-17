@@ -39,10 +39,15 @@ public class RequestHandlerFactory {
 		}
 	}
 
+	public boolean closeConnection() {
+		return !keepAlive;
+	}
+
 	/**
 	 * Parses only the Request-line of the Request (first line).
 	 */
 	private boolean parseRequestLine() throws IOException {
+		keepAlive = false;
 		String line = in.readLine();
 
 		/* line might be null if the connection closed after SYN/SYNACK */
@@ -66,9 +71,7 @@ public class RequestHandlerFactory {
 		if (!version.startsWith("HTTP/1."))
 			return false;
 		version = version.substring(1 + version.indexOf("."));
-		if (version.equals("0"))
-			keepAlive = false;
-		else if (version.equals("1"))
+		if (version.equals("1"))
 			keepAlive = true;
 		else
 			return false;
