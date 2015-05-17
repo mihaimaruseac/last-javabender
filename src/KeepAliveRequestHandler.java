@@ -51,4 +51,9 @@ public class KeepAliveRequestHandler extends ItemRequestHandler {
 	protected void restoreOutput() {
 		rh.restoreOutput();
 	}
+
+	@Override
+	protected void setNewBody(byte newBody[], int sz) {
+		rh.setNewBody(newBody, sz);
+	}
 }

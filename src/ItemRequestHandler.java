@@ -24,6 +24,8 @@ public abstract class ItemRequestHandler extends RequestHandler {
 			this.uri = TinyHttpd.properties.getProperty("INDEX", "index.html");
 	}
 
+	protected ItemRequestHandler() {}
+
 	@Override
 	protected void parseBody() throws IOException {
 		System.out.println("Client asked for >" + uri + "<");
@@ -80,5 +82,11 @@ public abstract class ItemRequestHandler extends RequestHandler {
 	@Override
 	protected void sendBody() {
 		out.write(buf, 0, resourceLength);
+	}
+
+	/* overwrite this for decorators */
+	protected void setNewBody(byte newBody[], int sz) {
+		buf = newBody;
+		resourceLength = sz;
 	}
 }

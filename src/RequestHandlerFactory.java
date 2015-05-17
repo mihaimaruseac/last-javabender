@@ -23,8 +23,10 @@ public class RequestHandlerFactory {
 		if (keepAlive && rh instanceof ItemRequestHandler)
 			rh = new KeepAliveRequestHandler((ItemRequestHandler)rh);
 
+		/*
 		if (compressedContent && rh instanceof ItemRequestHandler)
 			rh = new CompressedRequestHandler((ItemRequestHandler)rh);
+			*/
 
 		return rh;
 	}
@@ -38,8 +40,10 @@ public class RequestHandlerFactory {
 	 */
 	private RequestHandler getBaseHandler() throws IOException {
 		/* read Request-Line, might get a bad request */
-		if (!parseRequestLine())
+		if (!parseRequestLine()) {
+			keepAlive = false;
 			return new BadRequestHandler(in, out);
+		}
 
 		/* ignore all headers but Connection, Content-Length and
 		 * Accept-Encoding
