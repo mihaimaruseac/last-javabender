@@ -12,14 +12,15 @@ public abstract class ItemRequestHandler implements RequestHandler {
 	private BufferedReader in;
 	private PrintStream out;
 	private String uri;
+	private boolean keepAlive;
 
-	public ItemRequestHandler(BufferedReader in, PrintStream out, String uri) {
+	public ItemRequestHandler(BufferedReader in, PrintStream out, String uri, boolean keepAlive) {
 		this.in = in;
 		this.out = out;
+		this.keepAlive = keepAlive;
+		this.uri = uri;
 		if (uri.equals(""))
 			this.uri = "index.html";
-		else
-			this.uri = uri;
 	}
 
 	public void handle() {
@@ -42,6 +43,8 @@ public abstract class ItemRequestHandler implements RequestHandler {
 
 	protected void sendHeaders(int len) {
 		Date now = new Date();
+		if (keepAlive)
+			out.println("Connection: keep-alive");
 		out.println("Content-Type: text/html");
 		out.println("Content-Length: " + len);
 		out.println("Server: MM's Java Server");

@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public class HEADRequestHandler extends ItemRequestHandler {
-	public HEADRequestHandler(BufferedReader in, PrintStream out, String uri) {
-		super(in, out, uri);
+	public HEADRequestHandler(BufferedReader in, PrintStream out, String uri, boolean keepAlive) {
+		super(in, out, uri, keepAlive);
 	}
 
 	/**

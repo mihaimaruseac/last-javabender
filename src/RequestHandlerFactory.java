@@ -33,8 +33,8 @@ public class RequestHandlerFactory {
 
 		/* act upon verb and connection */
 		switch (verb) {
-			case "GET":  return new GETRequestHandler(in, out, uri);
-			case "HEAD": return new HEADRequestHandler(in, out, uri);
+			case "GET":  return new GETRequestHandler(in, out, uri, keepAlive);
+			case "HEAD": return new HEADRequestHandler(in, out, uri, keepAlive);
 			default:     return new NotImplementedHandler(out);
 		}
 	}
