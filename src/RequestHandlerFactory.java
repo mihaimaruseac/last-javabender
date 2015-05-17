@@ -6,31 +6,19 @@ public class RequestHandlerFactory {
 	private BufferedReader in;
 	private PrintStream out;
 
+	private String verb;
+	private String uri;
+	private String version;
+
 	public RequestHandlerFactory(BufferedReader in, PrintStream out) {
 		this.in = in;
 		this.out = out;
 	}
 
-	/**
-	 * Parses only the Request-line of the Request (first line).
-	 */
 	public RequestHandler getHandler() throws IOException {
-		String line = in.readLine();
-		if (line == null)
-			return null;
-
-		String components[] = line.split("\\s");
-
-		if (components.length != 3)
+		/* read Request-Line, might get a bad request */
+		if (!parseRequestLine())
 			return new BadRequestHandler(out);
-
-		String verb    = components[0];
-		String uri     = components[1];
-		String version = components[2];
-
-		if (!uri.startsWith("/"))
-			return new BadRequestHandler(out);
-		uri = uri.substring(1, uri.length());
 
 		switch (verb) {
 			case "GET":  return new GETRequestHandler(in, out, uri);
@@ -38,5 +26,31 @@ public class RequestHandlerFactory {
 			default:     return new NotImplementedHandler(out);
 		}
 	}
-}
 
+	/**
+	 * Parses only the Request-line of the Request (first line).
+	 */
+	private boolean parseRequestLine() throws IOException {
+		String line = in.readLine();
+
+		/* line might be null if the connection closed after SYN/SYNACK */
+		if (line == null)
+			return false;
+
+		System.out.println("Request-line: " + line);
+		String components[] = line.split("\\s");
+
+		if (components.length != 3)
+			return false;
+
+		verb    = components[0];
+		uri     = components[1];
+		version = components[2];
+
+		if (!uri.startsWith("/"))
+			return false;
+		uri = uri.substring(1, uri.length());
+
+		return true;
+	}
+}
