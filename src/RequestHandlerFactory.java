@@ -16,6 +16,9 @@ public class RequestHandlerFactory {
 	 */
 	public RequestHandler getHandler() throws IOException {
 		String line = in.readLine();
+		if (line == null)
+			return null;
+
 		String components[] = line.split("\\s");
 
 		if (components.length != 3)
