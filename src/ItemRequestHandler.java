@@ -60,18 +60,6 @@ public abstract class ItemRequestHandler extends RequestHandler {
 
 	@Override
 	protected void sendBody() {
-		try {
-			DataInputStream fin = new DataInputStream(new FileInputStream(theFile));
-			try {
-				byte buf[] = new byte[resourceLength];
-				fin.readFully(buf);
-				out.write(buf, 0, resourceLength);
-			} finally {
-				fin.close();
-			}
-		} catch (IOException ex) {
-			/* impossible anyway */
-			ex.printStackTrace();
-		}
+		out.write(FileCacheLRU.getInstance().fetch(theFile), 0, resourceLength);
 	}
 }
