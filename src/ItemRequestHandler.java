@@ -60,6 +60,12 @@ public abstract class ItemRequestHandler extends RequestHandler {
 
 	@Override
 	protected void sendBody() {
-		out.write(FileCacheLRU.getInstance().fetch(theFile), 0, resourceLength);
+		FileCache fc;
+		if (TinyHttpd.properties.getProperty("CACHE_TYPE", "LRU").equals("LRU"))
+			fc = FileCacheLRU.getInstance();
+		else
+			fc = FileCacheLFU.getInstance();
+
+		out.write(fc.fetch(theFile), 0, resourceLength);
 	}
 }
