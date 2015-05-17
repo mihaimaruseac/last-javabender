@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.util.Date;
 
 public abstract class ItemRequestHandler extends RequestHandler {
-	private static final String ROOT = "res";
+	private static final String ROOT = TinyHttpd.properties.getProperty("ROOT", "res");
 
 	protected String uri;
 	private boolean keepAlive;
