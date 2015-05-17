@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.PrintStream;
 
 public class KeepAliveRequestHandler extends RequestHandler {
@@ -23,7 +24,7 @@ public class KeepAliveRequestHandler extends RequestHandler {
 		rh.sendBody();
 	}
 
-	protected void parseBody() {
+	protected void parseBody() throws IOException {
 		rh.parseBody();
 	}
 }

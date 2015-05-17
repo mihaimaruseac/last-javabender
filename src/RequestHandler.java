@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.PrintStream;
 
 public abstract class RequestHandler {
@@ -12,7 +13,7 @@ public abstract class RequestHandler {
 
 	protected RequestHandler() {}
 
-	public void handle() {
+	public void handle() throws IOException {
 		parseBody();
 		sendStatusCode();
 		sendHeaders();
@@ -27,5 +28,5 @@ public abstract class RequestHandler {
 	/* can override the following, if need be */
 	protected void sendHeaders() {}
 	protected void sendBody() {}
-	protected void parseBody() {}
+	protected void parseBody() throws IOException {}
 }

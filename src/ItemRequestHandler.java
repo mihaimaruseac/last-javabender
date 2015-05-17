@@ -9,11 +9,11 @@ import java.util.Date;
 public abstract class ItemRequestHandler extends RequestHandler {
 	private static final String ROOT = "res";
 
-	private String uri;
+	protected String uri;
 	private boolean keepAlive;
 
 	private boolean is200 = true;
-	private int resourceLength = 0;
+	protected int resourceLength = 0;
 	private File theFile;
 
 	public ItemRequestHandler(BufferedReader in, PrintStream out, String uri) {
@@ -24,7 +24,7 @@ public abstract class ItemRequestHandler extends RequestHandler {
 	}
 
 	@Override
-	protected void parseBody() {
+	protected void parseBody() throws IOException {
 		System.out.println("Client asked for >" + uri + "<");
 		theFile = new File(ROOT, uri);
 		System.out.println("Got >" + theFile + "<");

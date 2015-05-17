@@ -38,10 +38,13 @@ public class RequestHandlerFactory {
 
 		/* ignore all headers but Connection */
 		String line;
+		int contentLength = 0;
 		while ((line = in.readLine()) != null) {
 			System.out.println("Got header: " + line);
 			if (line.equals("Connection: keep-alive"))
 				keepAlive = true;
+			if (line.startsWith("Content-Length:"))
+				contentLength = Integer.parseInt(line.substring(1 + line.indexOf(" ")));
 			else if (line.equals(""))
 				break;
 		}
@@ -50,6 +53,7 @@ public class RequestHandlerFactory {
 		switch (verb) {
 			case "GET":  return new GETRequestHandler(in, out, uri);
 			case "HEAD": return new HEADRequestHandler(in, out, uri);
+			case "POST": return new POSTRequestHandler(in, out, uri, contentLength);
 			default:     return new NotImplementedHandler(in, out);
 		}
 	}
