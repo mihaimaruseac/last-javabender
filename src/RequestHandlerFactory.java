@@ -23,10 +23,9 @@ public class RequestHandlerFactory {
 		if (keepAlive && rh instanceof ItemRequestHandler)
 			rh = new KeepAliveRequestHandler((ItemRequestHandler)rh);
 
-		/*
+		compressedContent = false;
 		if (compressedContent && rh instanceof ItemRequestHandler)
 			rh = new CompressedRequestHandler((ItemRequestHandler)rh);
-			*/
 
 		return rh;
 	}
