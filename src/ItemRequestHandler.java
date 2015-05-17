@@ -18,7 +18,6 @@ public abstract class ItemRequestHandler extends RequestHandler {
 
 	public ItemRequestHandler(BufferedReader in, PrintStream out, String uri) {
 		super(in, out);
-		//this.keepAlive = keepAlive; // TODO: remove
 		this.uri = uri;
 		if (uri.equals(""))
 			this.uri = "index.html";
@@ -52,12 +51,6 @@ public abstract class ItemRequestHandler extends RequestHandler {
 			return;
 
 		Date now = new Date();
-		// TODO: remove
-		/*
-		if (keepAlive)
-			out.println("Connection: keep-alive");
-			*/
-		// TODO: up to here
 		out.println("Content-Type: text/html");
 		out.println("Content-Length: " + resourceLength);
 		out.println("Server: MM's Java Server");
