@@ -16,7 +16,7 @@ public class TinyHttpd {
 					System.out.println("Listening to a connection on the local port " +
 							serverSocket.getLocalPort() + "...");
 					Socket client = serverSocket.accept();
-					new Thread(new HTTPManager(client)).start();
+					StaticThreadPool.getInstance().execute(new HTTPManager(client));
 				}
 			} finally {
 				serverSocket.close();
