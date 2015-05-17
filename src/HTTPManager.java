@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 public class HTTPManager implements Runnable {
+	private static final int SOCKET_TIMEOUT = Integer.parseInt(
+			TinyHttpd.properties.getProperty("SOCKET_TIMEOUT", "3000"));
 	public Socket client;
 
 	public HTTPManager(Socket client) {
@@ -17,7 +19,7 @@ public class HTTPManager implements Runnable {
 				client.getInetAddress().toString());
 
 		try {
-			client.setSoTimeout(30000);
+			client.setSoTimeout(SOCKET_TIMEOUT);
 			BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			PrintStream out = new PrintStream(client.getOutputStream());
 
