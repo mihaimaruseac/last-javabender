@@ -2,11 +2,12 @@ import java.util.ArrayList;
 import java.util.concurrent.locks.*;
 
 public final class StaticThreadPool {
+	private final int MAX_THREAD_NUM = Integer.parseInt(
+			TinyHttpd.properties.getProperty("THREAD_POOL_SIZE", "20"));
+
 	private WaitingRunnableQueue queue = null;
 	private ArrayList<ThreadPoolThread> availableThreads = null;
 	private static StaticThreadPool instance = new StaticThreadPool();
-
-	private final int MAX_THREAD_NUM = 20;
 
 	private StaticThreadPool() {
 		queue = new ArrayListWaitingRunnableQueue(this);

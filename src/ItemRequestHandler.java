@@ -20,7 +20,7 @@ public abstract class ItemRequestHandler extends RequestHandler {
 		super(in, out);
 		this.uri = uri;
 		if (uri.equals(""))
-			this.uri = "index.html";
+			this.uri = TinyHttpd.properties.getProperty("INDEX", "index.html");
 	}
 
 	@Override
