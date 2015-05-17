@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 public class FileCacheLRU extends FileCache {
 	private static FileCacheLRU instance = new FileCacheLRU();
+
 	private HashMap<File, Date> timestamps = new HashMap<>();
 
 	private FileCacheLRU() {}

@@ -2,6 +2,7 @@ import java.io.File;
 
 public class FileCacheLFU extends FileCache {
 	private static FileCacheLFU instance = new FileCacheLFU();
+
 	/* keep a different ac for thread sync */
 	private AccessCounter ac = new AccessCounter();
 
