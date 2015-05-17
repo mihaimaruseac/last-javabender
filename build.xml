@@ -1,0 +1,39 @@
+<project xmlns:jacoco="antlib:org.jacoco.ant"
+	name="HW-24" default="all" basedir=".">
+
+	<property name="src" location="src"/>
+	<property name="bin" location="bin"/>
+
+	<target name="init">
+		<mkdir dir="${bin}"/>
+	</target>
+
+	<target name="build" depends="init">
+		<javac srcdir="${src}" destdir="${bin}"
+			debug="on" debuglevel="lines,vars,source"
+			includeantruntime="true" fork="true">
+		</javac>
+	</target>
+
+	<target name="run" depends="build">
+		<java classname="TinyHttpd2" fork="true">
+			<classpath>
+				<pathelement location="${bin}"/>
+			</classpath>
+		</java>
+	</target>
+
+	<target name="run2" depends="build">
+		<java classname="TinyHttpd3" fork="true">
+			<classpath>
+				<pathelement location="${bin}"/>
+			</classpath>
+		</java>
+	</target>
+
+	<target name="clean">
+		<delete dir="${bin}"/>
+	</target>
+
+	<target name="all" depends="run, run2"/>
+</project>
