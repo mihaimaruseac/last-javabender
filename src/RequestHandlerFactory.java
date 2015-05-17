@@ -17,9 +17,24 @@ public class RequestHandlerFactory {
 	}
 
 	public RequestHandler getHandler() throws IOException {
+		RequestHandler rh = getBaseHandler();
+		if (keepAlive)
+			return new KeepAliveRequestHandler(rh);
+
+		return rh;
+	}
+
+	public boolean closeConnection() {
+		return !keepAlive;
+	}
+
+	/**
+	 * Gets the base handler, can be decorated for keep-alive connections
+	 */
+	private RequestHandler getBaseHandler() throws IOException {
 		/* read Request-Line, might get a bad request */
 		if (!parseRequestLine())
-			return new BadRequestHandler(out);
+			return new BadRequestHandler(in, out);
 
 		/* ignore all headers but Connection */
 		String line;
@@ -33,14 +48,10 @@ public class RequestHandlerFactory {
 
 		/* act upon verb and connection */
 		switch (verb) {
-			case "GET":  return new GETRequestHandler(in, out, uri, keepAlive);
-			case "HEAD": return new HEADRequestHandler(in, out, uri, keepAlive);
-			default:     return new NotImplementedHandler(out);
+			case "GET":  return new GETRequestHandler(in, out, uri);
+			case "HEAD": return new HEADRequestHandler(in, out, uri);
+			default:     return new NotImplementedHandler(in, out);
 		}
-	}
-
-	public boolean closeConnection() {
-		return !keepAlive;
 	}
 
 	/**
@@ -71,7 +82,9 @@ public class RequestHandlerFactory {
 		if (!version.startsWith("HTTP/1."))
 			return false;
 		version = version.substring(1 + version.indexOf("."));
-		if (version.equals("1"))
+		if (version.equals("0"))
+			keepAlive = false;
+		else if (version.equals("1"))
 			keepAlive = true;
 		else
 			return false;

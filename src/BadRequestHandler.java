@@ -1,15 +1,13 @@
+import java.io.BufferedReader;
 import java.io.PrintStream;
 
-public class BadRequestHandler implements RequestHandler {
-	private PrintStream out;
-
-	public BadRequestHandler(PrintStream out) {
-		this.out = out;
+public class BadRequestHandler extends RequestHandler {
+	public BadRequestHandler(BufferedReader in, PrintStream out) {
+		super(in, out);
 	}
 
-	public void handle() {
+	@Override
+	protected void sendStatusCode() {
 		out.println("HTTP/1.0 400 Bad Request");
-		out.println("");
-		out.flush();
 	}
 }

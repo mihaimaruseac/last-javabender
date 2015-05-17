@@ -6,59 +6,73 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
 
-public abstract class ItemRequestHandler implements RequestHandler {
+public abstract class ItemRequestHandler extends RequestHandler {
 	private static final String ROOT = "res";
 
-	private BufferedReader in;
-	private PrintStream out;
 	private String uri;
 	private boolean keepAlive;
 
-	public ItemRequestHandler(BufferedReader in, PrintStream out, String uri, boolean keepAlive) {
-		this.in = in;
-		this.out = out;
-		this.keepAlive = keepAlive;
+	private boolean is200 = true;
+	private int resourceLength = 0;
+	private File theFile;
+
+	public ItemRequestHandler(BufferedReader in, PrintStream out, String uri) {
+		super(in, out);
+		//this.keepAlive = keepAlive; // TODO: remove
 		this.uri = uri;
 		if (uri.equals(""))
 			this.uri = "index.html";
 	}
 
-	public void handle() {
+	@Override
+	protected void parseBody() {
 		System.out.println("Client asked for >" + uri + "<");
-		File file = new File(ROOT, uri);
-		System.out.println("Got >" + file + "<");
-		if (!file.exists() || !file.canRead() || !file.isFile()) {
-			out.println("HTTP/1.0 404 Not Found");
-			out.println("");
-		} else {
-			int len = (int)file.length();
-			out.println("HTTP/1.0 200 OK");
-			sendHeaders(len);
-			out.println("");
-			sendFile(file, len);
+		theFile = new File(ROOT, uri);
+		System.out.println("Got >" + theFile + "<");
+
+		if (!theFile.exists() || !theFile.canRead() || !theFile.isFile()) {
+			is200 = false;
+			return;
 		}
 
-		out.flush();
+		resourceLength = (int)theFile.length();
 	}
 
-	protected void sendHeaders(int len) {
+	@Override
+	protected void sendStatusCode() {
+		if (!is200)
+			out.println("HTTP/1.0 404 Not Found");
+		else
+			out.println("HTTP/1.0 200 OK");
+	}
+
+	@Override
+	protected void sendHeaders() {
+		if (!is200)
+			return;
+
 		Date now = new Date();
+		// TODO: remove
+		/*
 		if (keepAlive)
 			out.println("Connection: keep-alive");
+			*/
+		// TODO: up to here
 		out.println("Content-Type: text/html");
-		out.println("Content-Length: " + len);
+		out.println("Content-Length: " + resourceLength);
 		out.println("Server: MM's Java Server");
 		out.println("Date: " + now);
 		out.println("Last-Modified: " + now);
 	}
 
-	protected void sendFile(File file, int len) {
+	@Override
+	protected void sendBody() {
 		try {
-			DataInputStream fin = new DataInputStream(new FileInputStream(file));
+			DataInputStream fin = new DataInputStream(new FileInputStream(theFile));
 			try {
-				byte buf[] = new byte[len];
+				byte buf[] = new byte[resourceLength];
 				fin.readFully(buf);
-				out.write(buf, 0, len);
+				out.write(buf, 0, resourceLength);
 			} finally {
 				fin.close();
 			}

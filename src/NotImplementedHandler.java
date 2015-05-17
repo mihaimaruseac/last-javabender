@@ -1,15 +1,13 @@
+import java.io.BufferedReader;
 import java.io.PrintStream;
 
-public class NotImplementedHandler implements RequestHandler {
-	private PrintStream out;
-
-	public NotImplementedHandler(PrintStream out) {
-		this.out = out;
+public class NotImplementedHandler extends RequestHandler {
+	public NotImplementedHandler(BufferedReader in, PrintStream out) {
+		super(in, out);
 	}
 
-	public void handle() {
+	@Override
+	protected void sendStatusCode() {
 		out.println("HTTP/1.0 501 Not Implemented");
-		out.println("");
-		out.flush();
 	}
 }
