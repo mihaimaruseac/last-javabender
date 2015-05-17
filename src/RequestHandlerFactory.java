@@ -9,7 +9,8 @@ public class RequestHandlerFactory {
 	private String verb;
 	private String uri;
 	private String version;
-	private boolean keepAlive;
+	private boolean keepAlive = false;
+	private boolean compressedContent = false;
 
 	public RequestHandlerFactory(BufferedReader in, PrintStream out) {
 		this.in = in;
@@ -18,8 +19,12 @@ public class RequestHandlerFactory {
 
 	public RequestHandler getHandler() throws IOException {
 		RequestHandler rh = getBaseHandler();
-		if (keepAlive)
-			return new KeepAliveRequestHandler(rh);
+
+		if (keepAlive && rh instanceof ItemRequestHandler)
+			rh = new KeepAliveRequestHandler((ItemRequestHandler)rh);
+
+		if (compressedContent && rh instanceof ItemRequestHandler)
+			rh = new CompressedRequestHandler((ItemRequestHandler)rh);
 
 		return rh;
 	}
@@ -36,13 +41,17 @@ public class RequestHandlerFactory {
 		if (!parseRequestLine())
 			return new BadRequestHandler(in, out);
 
-		/* ignore all headers but Connection */
+		/* ignore all headers but Connection, Content-Length and
+		 * Accept-Encoding
+		 */
 		String line;
 		int contentLength = 0;
 		while ((line = in.readLine()) != null) {
 			System.out.println("Got header: " + line);
 			if (line.equals("Connection: keep-alive"))
 				keepAlive = true;
+			if (line.startsWith("Accept-Encoding:"))
+				parseAcceptEncoding(line);
 			if (line.startsWith("Content-Length:"))
 				contentLength = Integer.parseInt(line.substring(1 + line.indexOf(" ")));
 			else if (line.equals(""))
@@ -62,7 +71,6 @@ public class RequestHandlerFactory {
 	 * Parses only the Request-line of the Request (first line).
 	 */
 	private boolean parseRequestLine() throws IOException {
-		keepAlive = false;
 		String line = in.readLine();
 
 		/* line might be null if the connection closed after SYN/SYNACK */
@@ -94,5 +102,14 @@ public class RequestHandlerFactory {
 			return false;
 
 		return true;
+	}
+
+	/**
+	 * Parses Accept-Encoding header and determines whether we can send gzip
+	 * encoded data to the client (if he supports this)
+	 */
+	private void parseAcceptEncoding(String line) {
+		line = line.substring(1 + line.indexOf(" "));
+		compressedContent = line.contains("*") || line.contains("gzip");
 	}
 }

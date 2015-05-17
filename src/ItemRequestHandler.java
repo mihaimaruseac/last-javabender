@@ -15,6 +15,7 @@ public abstract class ItemRequestHandler extends RequestHandler {
 	private boolean is200 = true;
 	protected int resourceLength = 0;
 	private File theFile;
+	protected byte[] buf;
 
 	public ItemRequestHandler(BufferedReader in, PrintStream out, String uri) {
 		super(in, out);
@@ -46,26 +47,38 @@ public abstract class ItemRequestHandler extends RequestHandler {
 	}
 
 	@Override
-	protected void sendHeaders() {
+	protected void sendLengthHeader() {
+		if (!is200)
+			return;
+
+		out.println("Content-Length: " + resourceLength);
+	}
+
+	@Override
+	protected void sendOtherHeaders() {
 		if (!is200)
 			return;
 
 		Date now = new Date();
 		out.println("Content-Type: text/html");
-		out.println("Content-Length: " + resourceLength);
 		out.println("Server: MM's Java Server");
 		out.println("Date: " + now);
 		out.println("Last-Modified: " + now);
 	}
 
 	@Override
-	protected void sendBody() {
+	protected void getBody() throws IOException {
 		FileCache fc;
 		if (TinyHttpd.properties.getProperty("CACHE_TYPE", "LRU").equals("LRU"))
 			fc = FileCacheLRU.getInstance();
 		else
 			fc = FileCacheLFU.getInstance();
 
-		out.write(fc.fetch(theFile), 0, resourceLength);
+		buf = fc.fetch(theFile);
+	}
+
+	@Override
+	protected void sendBody() {
+		out.write(buf, 0, resourceLength);
 	}
 }

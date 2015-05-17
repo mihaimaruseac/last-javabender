@@ -26,8 +26,7 @@ public class HTTPManager implements Runnable {
 			try {
 				RequestHandlerFactory rhf = new RequestHandlerFactory(in, out);
 				while (true) {
-					RequestHandler rh = rhf.getHandler();
-					rh.handle();
+					rhf.getHandler().handle();
 					if (rhf.closeConnection())
 						return;
 				}
