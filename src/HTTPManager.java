@@ -36,6 +36,8 @@ public class HTTPManager implements Runnable {
 				client.close();
 				System.out.println("A connection is closed.");
 			}
+		} catch (ClientClosedIOException ex) {
+			/* ignore */
 		} catch (SocketTimeoutException ex) {
 			/* ignore */
 		} catch (Exception ex) {

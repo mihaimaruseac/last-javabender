@@ -82,7 +82,7 @@ public class RequestHandlerFactory {
 
 		/* line might be null if the connection closed after SYN/SYNACK */
 		if (line == null)
-			return false;
+			throw new ClientClosedIOException("Client connection closed!");
 
 		System.out.println("Request-line: " + line);
 		String components[] = line.split("\\s");
