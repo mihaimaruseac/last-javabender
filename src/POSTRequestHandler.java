@@ -8,7 +8,7 @@ public class POSTRequestHandler extends ItemRequestHandler {
 	private boolean badFormat = false;
 	private StringBuilder sb = new StringBuilder();
 
-	private char buf[];
+	private char rqBuf[];
 
 	public POSTRequestHandler(BufferedReader in, PrintStream out, String uri, int contentLength) {
 		super(in, out, uri);
@@ -21,13 +21,13 @@ public class POSTRequestHandler extends ItemRequestHandler {
 		if (badFormat)
 			return;
 
-		buf = new char[contentLength];
-		in.read(buf, 0, contentLength);
+		rqBuf = new char[contentLength];
+		in.read(rqBuf, 0, contentLength);
 	}
 
 	@Override
 	protected void getBody() throws IOException {
-		String buff = new String(buf);
+		String buff = new String(rqBuf);
 		String components[] = buff.split("&");
 
 		sb.append("<html><head><title>");
@@ -51,6 +51,9 @@ public class POSTRequestHandler extends ItemRequestHandler {
 		}
 
 		sb.append("</table></body></html>");
+
+		resourceLength = sb.length();
+		buf = sb.toString().getBytes();
 	}
 
 	@Override
@@ -66,7 +69,6 @@ public class POSTRequestHandler extends ItemRequestHandler {
 		if (badFormat)
 			return;
 
-		resourceLength = sb.length();
 		super.sendLengthHeader();
 	}
 
@@ -75,13 +77,15 @@ public class POSTRequestHandler extends ItemRequestHandler {
 		if (badFormat)
 			return;
 
-		resourceLength = sb.length();
 		super.sendOtherHeaders();
 	}
 
 
 	@Override
 	protected void sendBody() {
-		out.println(sb);
+		if (badFormat)
+			return;
+
+		super.sendBody();
 	}
 }
