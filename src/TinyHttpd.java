@@ -14,28 +14,18 @@ public class TinyHttpd {
 	public static final Properties properties = readProperties();
 	private static final int PORT = Integer.parseInt(properties.getProperty("PORT", "8888"));
 
-	//private ServerSocket serverSocket;
-	private SSLServerSocket serverSocket;
+	private ServerSocket serverSocket;
 
-	public void init() {
-		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
-		System.setProperty("javax.net.ssl.keyStore", "key.cert.pcks12");
-		System.setProperty("javax.net.ssl.keyStorePassword", "Mihai");
+	public void init(boolean secure) {
 		try {
 			try {
-				SSLServerSocketFactory factory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-				serverSocket = (SSLServerSocket)factory.createServerSocket(PORT);
-				//serverSocket = new ServerSocket(PORT);
+				serverSocket = secure ? getSafeServerSocket() : getUnsafeServerSocket();
 				System.out.println("Server socket created.");
-
-				String enabledSuites[] = { "SSL_RSA_WITH_3DES_EDE_CBC_SHA" };
-				serverSocket.setEnabledCipherSuites(enabledSuites);
 
 				while (true) {
 					System.out.println("Listening to a connection on the local port " +
 							serverSocket.getLocalPort() + "...");
-					//Socket client = serverSocket.accept();
-					SSLSocket client = (SSLSocket)serverSocket.accept();
+					Socket client = serverSocket.accept();
 					StaticThreadPool.getInstance().execute(new HTTPManager(client));
 				}
 			} finally {
@@ -44,6 +34,26 @@ public class TinyHttpd {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	private ServerSocket getUnsafeServerSocket() throws IOException {
+		return new ServerSocket(PORT);
+	}
+
+	private ServerSocket getSafeServerSocket() throws IOException {
+		// TODO: properties
+		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
+		System.setProperty("javax.net.ssl.keyStore", "key/key.cert.pcks12");
+		System.setProperty("javax.net.ssl.keyStorePassword", "Mihai");
+
+		SSLServerSocketFactory factory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
+		SSLServerSocket sSocket = (SSLServerSocket)factory.createServerSocket(PORT);
+
+		// TODO: properties
+		String enabledSuites[] = { "SSL_RSA_WITH_3DES_EDE_CBC_SHA" };
+		sSocket.setEnabledCipherSuites(enabledSuites);
+
+		return sSocket;
 	}
 
 	private static Properties readProperties() {
@@ -62,6 +72,7 @@ public class TinyHttpd {
 	public static void main(String[] args) {
 		properties.list(System.out);
 		TinyHttpd server = new TinyHttpd();
-		server.init();
+		// TODO: properties
+		server.init(true);
 	}
 }
