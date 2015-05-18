@@ -47,7 +47,9 @@ public class TinyHttpd {
 		SSLServerSocket sSocket = (SSLServerSocket)factory.createServerSocket(PORT);
 
 		// TODO: properties
-		String enabledSuites[] = { "SSL_RSA_WITH_3DES_EDE_CBC_SHA" };
+		String enabledSuites[] = properties.getProperty("CIPHER_SUITES", "SSL_RSA_WITH_3DES_EDE_CBC_SHA").split(",");
+		for (String s : enabledSuites)
+			System.out.println(s);
 		sSocket.setEnabledCipherSuites(enabledSuites);
 
 		return sSocket;
