@@ -39,10 +39,9 @@ public class TinyHttpd {
 	}
 
 	private ServerSocket getSafeServerSocket() throws IOException {
-		// TODO: properties
-		System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
-		System.setProperty("javax.net.ssl.keyStore", "key/key.cert.pcks12");
-		System.setProperty("javax.net.ssl.keyStorePassword", "Mihai");
+		System.setProperty("javax.net.ssl.keyStoreType", properties.getProperty("KEY_TYPE", "PKCS12"));
+		System.setProperty("javax.net.ssl.keyStore", properties.getProperty("KEY_FILE", "key/key.cert.pcks12"));
+		System.setProperty("javax.net.ssl.keyStorePassword", properties.getProperty("KEY_PASS", "Mihai"));
 
 		SSLServerSocketFactory factory = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
 		SSLServerSocket sSocket = (SSLServerSocket)factory.createServerSocket(PORT);
@@ -70,7 +69,6 @@ public class TinyHttpd {
 	public static void main(String[] args) {
 		properties.list(System.out);
 		TinyHttpd server = new TinyHttpd();
-		// TODO: properties
-		server.init(true);
+		server.init(new Boolean(properties.getProperty("SECURE", "false")));
 	}
 }
